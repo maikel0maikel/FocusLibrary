@@ -8,6 +8,9 @@ buildscript {
         maven {
             url "https://raw.githubusercontent.com/maikel0maikel/logger/master"
         }
+        maven {
+            url "https://raw.githubusercontent.com/maikel0maikel/FocusLibrary/master"
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.1.1'
@@ -24,6 +27,9 @@ allprojects {
         jcenter()
         maven {
             url "https://raw.githubusercontent.com/maikel0maikel/logger/master"
+        }
+        maven {
+            url "https://raw.githubusercontent.com/maikel0maikel/FocusLibrary/master"
         }
     }
 }

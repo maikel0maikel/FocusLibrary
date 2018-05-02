@@ -15,7 +15,7 @@ public abstract class BaseFoucsHandlerActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        addFocusView();
+        addFocusView(getContentViewGroup());
         mCurrentFocusView = mFocusViews.get(0);
         setFocus(View.FOCUS_DOWN);
     }
@@ -32,8 +32,7 @@ public abstract class BaseFoucsHandlerActivity extends Activity {
         mCurrentFocusView.mFocusView.requestFocus();
     }
 
-    private void addFocusView() {
-        ViewGroup group = getContentViewGroup();
+    private void addFocusView(ViewGroup group) {
         int childCount = group.getChildCount();
         for (int i = 0; i < childCount; i++) {
             View childeView = group.getChildAt(i);
