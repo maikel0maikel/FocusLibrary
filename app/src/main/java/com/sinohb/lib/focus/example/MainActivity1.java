@@ -94,7 +94,7 @@ public class MainActivity1 extends BaseFoucsHandlerActivity {
         addPreparedFocusView(findViewById(R.id.backBtn));
         addPreparedFocusView(mListview);
 //        addPreparedFocusView(currentFragment.getContentGroup());
-        startFocusPosition(0);
+//        startFocusPosition(0);
     }
 
     private List<String> initData() {

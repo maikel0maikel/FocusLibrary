@@ -2,7 +2,6 @@ package com.sinohb.lib.keyeventhandle;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,7 +92,6 @@ public class KeyEventHandler {
             }
         }
         if (mCurrentFocusView.mFocusView == null) {
-            Log.e("", "");
             return;
         }
         mCurrentFocusView.mFocusView.setFocusableInTouchMode(true);
@@ -114,10 +112,13 @@ public class KeyEventHandler {
                         recycleFocusPos = recycleViewChildCount - 1;
                     }
                     handleRecyclerViewItemFocus(recycleFocusPos, deration);
+                }else {
+                    isHandleRecyclerView = false;
                 }
+            }else {
+                isHandleRecyclerView = false;
             }
         }
-        Log.e("setFocus", "position:" + mCurrentFocusView.mFocusView);
     }
 
     private void handleListView(int deration) {

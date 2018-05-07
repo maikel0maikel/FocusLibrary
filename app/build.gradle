@@ -26,7 +26,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation 'com.sinohb:logger:1.0.1'
-//    implementation 'com.sinohb.lib:keyeventhandle:1.0.7'
-    implementation project(':keyeventhandler')
+    implementation 'com.sinohb.lib:keyeventhandle:1.1.1'
+   // implementation project(':keyeventhandler')
     implementation 'com.zhy:autolayout:1.4.5'
+    implementation 'com.android.support:recyclerview-v7:23.0.1'
 }

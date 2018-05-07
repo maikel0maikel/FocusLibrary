@@ -18,13 +18,15 @@ allprojects {
 studio3.0以下
 ```groovy
 dependencies {
-     compile 'com.sinohb.lib:keyeventhandle:1.1.0'
+     compile 'com.sinohb.lib:keyeventhandle:1.1.2'
+     compile 'com.android.support:recyclerview-v7:23.0.1'//加上这个是因为有些项目用了recyclerview，所以要适配
 }
 ```
  studio3.0以上（含3.0）
  ```groovy
  dependencies {
-      implementation 'com.sinohb.lib:keyeventhandle:1.1.0'
+      implementation 'com.sinohb.lib:keyeventhandle:1.1.2'
+      compile 'com.android.support:recyclerview-v7:23.0.1'//加上这个是因为有些项目用了recyclerview，所以要适配
  }
 ```
 三、activity中使用继承BaseFoucsHandlerActivity

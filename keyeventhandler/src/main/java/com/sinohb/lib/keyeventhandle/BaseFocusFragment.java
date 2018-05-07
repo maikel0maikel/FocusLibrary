@@ -2,7 +2,6 @@ package com.sinohb.lib.keyeventhandle;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -60,14 +59,12 @@ public abstract class BaseFocusFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.e("BaseFocusFragment","onResume");
     }
 
     @Override
     public void onStart() {
         super.onStart();
         //mActivity.addPreparedFocusView(getContentViewGroup());
-        Log.e("BaseFocusFragment","onStart");
     }
 
     @Override
@@ -81,7 +78,6 @@ public abstract class BaseFocusFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        Log.e("BaseFocusFragment","onStop");
     }
 
     @Override
@@ -93,6 +89,5 @@ public abstract class BaseFocusFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.e("BaseFocusFragment","onDestroy");
     }
 }

@@ -1,7 +1,6 @@
 package com.sinohb.lib.keyeventhandle;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,17 +25,14 @@ public abstract class BaseFocusPopupWindow extends PopupWindow implements View.O
         if (KeyEvent.ACTION_DOWN == event.getAction()) {
             switch (keyCode) {
                 case KeyEvent.KEYCODE_DPAD_UP:
-                    Log.e("onKey", "keyCode:" + keyCode);
                     mCurrentFocusView = mCurrentFocusView.mUpFocusView;
                     setFocus(View.FOCUS_UP);
                     return true;
                 case KeyEvent.KEYCODE_DPAD_DOWN:
-                    Log.e("onKey", "keyCode:" + keyCode);
                     mCurrentFocusView = mCurrentFocusView.mDownFocusView;
                     setFocus(View.FOCUS_DOWN);
                     return true;
                 case KeyEvent.KEYCODE_ENTER:
-                    Log.e("onKey", "keyCode:" + keyCode);
                     if (mCurrentFocusView.mFocusView instanceof AbsListView) {
                         return false;
                     } else {

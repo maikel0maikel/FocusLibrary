@@ -2,7 +2,6 @@ package com.sinohb.lib.keyeventhandle;
 
 import android.content.Context;
 import android.preference.PreferenceFragment;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -62,7 +61,6 @@ public abstract class BaseFocusPreferenceFragment extends PreferenceFragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.e("BaseFocusFragment", "onResume");
     }
 
     @Override
@@ -72,7 +70,6 @@ public abstract class BaseFocusPreferenceFragment extends PreferenceFragment {
 //        if (mViewGroup!=null){
 //            mActivity.addPreparedFocusView(mViewGroup);
 //        }
-        Log.e("BaseFocusFragment", "onStart");
     }
 
     @Override
@@ -86,7 +83,6 @@ public abstract class BaseFocusPreferenceFragment extends PreferenceFragment {
     @Override
     public void onStop() {
         super.onStop();
-        Log.e("BaseFocusFragment", "onStop");
     }
 
     @Override
@@ -100,7 +96,6 @@ public abstract class BaseFocusPreferenceFragment extends PreferenceFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.e("BaseFocusFragment", "onDestroy");
     }
 
 }
