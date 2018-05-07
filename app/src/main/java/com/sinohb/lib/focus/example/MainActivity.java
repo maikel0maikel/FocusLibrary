@@ -13,10 +13,18 @@ public class MainActivity extends BaseFoucsHandlerActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_rate);
         relativeLayout = findViewById(R.id.rootView);
 
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        addFilterListenerView(getContentViewGroup());
+        startFocusPosition(0);
+    }
+
     public void click(View view){
         switch (view.getId()){
             case R.id.b1:

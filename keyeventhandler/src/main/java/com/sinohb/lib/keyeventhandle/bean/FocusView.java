@@ -5,15 +5,16 @@ public class FocusView<T> {
     public FocusView mUpFocusView;
     public FocusView mDownFocusView;
     public T mFocusView;
-
-    public FocusView(T currentFocusView, FocusView upFocus, FocusView downFocus) {
+    public int position;
+    public FocusView(T currentFocusView, FocusView upFocus, FocusView downFocus, int position) {
         this.mFocusView = currentFocusView;
         this.mUpFocusView = upFocus;
         this.mDownFocusView = downFocus;
+        this.position = position;
     }
 
     public FocusView(T view) {
-        this(view, null, null);
+        this(view, null, null,0);
     }
 }
 

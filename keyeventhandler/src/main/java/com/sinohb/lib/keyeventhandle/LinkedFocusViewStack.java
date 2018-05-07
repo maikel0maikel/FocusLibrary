@@ -37,18 +37,80 @@ public class LinkedFocusViewStack<T> {
         return node;
     }
 
-    private boolean add(FocusView<T> node, T value) {
-        //新建一个节点，新节点的next指向node，新节点的pre指向node的pre
-        //完成指向过程node.pre←newNode→node
-        FocusView<T> newNode = new FocusView<T>(value, node.mUpFocusView, node);
-        //维持双向链表的指向，将node的pre节点的next指向新节点,完成指向过程node.pre→newNode
+    public boolean add(FocusView<T> node, T value) {
+        FocusView<T> newNode = new FocusView<T>(value, node.mUpFocusView, node,size);
         node.mUpFocusView.mDownFocusView = newNode;
-        //node节点的前一个节点指向新节点，完成指向过程newNode←node
         node.mUpFocusView = newNode;
-        //上面两行代码不能颠倒，否则node的前一个节点会被覆盖成新节点，会丢失node原来的前一个节点的next指向
-        //上述代码完成了在node节点和node前一个节点之间加入一个新节点，并维护了双向关系
         this.size++;
         return true;
+    }
+    public int remove(T obj)//删除指定value的节点
+    {
+        FocusView<T> node;
+//        for(node = header.mDownFocusView; node!=header; node=node.mDownFocusView)
+//        {
+//            if(node.mFocusView == obj || (obj!=null && obj.equals(node.mFocusView)))
+//            {
+//                remove(node);
+//                return true;
+//            }
+//        }
+        int index = 0;
+        if(obj==null)
+        {
+            for(node = header.mDownFocusView; node!=header; node=node.mDownFocusView)
+            {
+                index++;
+                if(node.mFocusView == null)
+                {
+                    remove(node);
+                    return index;
+                }
+            }
+        }
+        else
+        {
+            for(node = header.mDownFocusView; node!=header; node=node.mDownFocusView)
+            {
+                index++;
+                if(node.mFocusView == obj || obj.equals(node.mFocusView))
+                {
+                    remove(node);
+                    return index;
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    public int findFocusView(T obj){
+        FocusView<T> node;
+        int index = 0;
+        if(obj==null)
+        {
+            for(node = header.mDownFocusView; node!=header; node=node.mDownFocusView)
+            {
+                index++;
+                if(node.mFocusView == null)
+                {
+                    return index;
+                }
+            }
+        }
+        else
+        {
+            for(node = header.mDownFocusView; node!=header; node=node.mDownFocusView)
+            {
+                index++;
+                if(node.mFocusView == obj || obj.equals(node.mFocusView))
+                {
+                    return index;
+                }
+            }
+        }
+
+        return -1;
     }
 
     public FocusView<T> get(int index) {
@@ -59,20 +121,16 @@ public class LinkedFocusViewStack<T> {
         return header;
     }
 
-    private T remove(FocusView<T> node) {
-        //node的前一个节点next指向node的下一个节点
-        //node的下一个节点pre指向node的前一个节点
-        //A→node←B改成A→←B
+    public T remove(FocusView<T> node) {
         node.mUpFocusView.mDownFocusView = node.mDownFocusView;
         node.mDownFocusView.mUpFocusView = node.mUpFocusView;
-        //node的前后指向null
-        //A←node→B改成null←node→null
         node.mUpFocusView = node.mDownFocusView = null;
         T value = node.mFocusView;
         node.mFocusView = null;
         this.size--;
         return value;
     }
+
 
     public void clear() {
         FocusView<T> node = header.mDownFocusView;

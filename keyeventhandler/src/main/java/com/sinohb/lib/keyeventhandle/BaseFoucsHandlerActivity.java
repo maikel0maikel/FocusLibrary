@@ -1,75 +1,110 @@
 package com.sinohb.lib.keyeventhandle;
 
-import android.app.Activity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 
-import com.sinohb.lib.keyeventhandle.bean.FocusView;
+import com.zhy.autolayout.AutoLayoutActivity;
 
 
-public abstract class BaseFoucsHandlerActivity extends Activity {
-    protected LinkedFocusViewStack<View> mFocusViews = new LinkedFocusViewStack<>();
-    private FocusView<View> mCurrentFocusView;
-
+public abstract class BaseFoucsHandlerActivity extends AutoLayoutActivity {
+    private KeyEventHandler mHandler = new KeyEventHandler();
     @Override
     protected void onStart() {
         super.onStart();
-        addFocusView(getContentViewGroup());
-        mCurrentFocusView = mFocusViews.get(0);
-        setFocus(View.FOCUS_DOWN);
     }
 
-    private void setFocus(int deration) {
-        if (mCurrentFocusView.mFocusView == null) {
-            if (deration == View.FOCUS_DOWN) {
-                mCurrentFocusView = mCurrentFocusView.mDownFocusView;
-            } else {
-                mCurrentFocusView = mCurrentFocusView.mUpFocusView;
-            }
-        }
-        mCurrentFocusView.mFocusView.setFocusable(true);
-        mCurrentFocusView.mFocusView.requestFocus();
+    public void addPreparedFocusGroup() {
+        mHandler.addPreparedFocusGroup(getContentViewGroup());
+    }
+    public void addPreparedFocusGroup(ViewGroup group) {
+        mHandler.addPreparedFocusGroup(group);
+    }
+    public void startFocusPosition(int position) {
+        mHandler.startFocusPosition(position);
     }
 
-    private void addFocusView(ViewGroup group) {
-        int childCount = group.getChildCount();
-        for (int i = 0; i < childCount; i++) {
-            View childeView = group.getChildAt(i);
-            if (childeView == null) {
-                continue;
-            }
-            if (!childeView.hasOnClickListeners()){
-                continue;
-            }
-            mFocusViews.add(childeView);
-        }
+
+    public int remove(View view) {
+        return mHandler.remove(view);
+    }
+    public int findView(View view){
+        return mHandler.findView(view);
+    }
+    public void clearAllFocus() {
+        mHandler.clearAllFocus();
+    }
+
+    public void addFocusView(ViewGroup group) {
+        mHandler.addFocusView(group);
+    }
+
+    public void addFilterListenerView(ViewGroup group) {
+        mHandler.addFilterListenerView(group);
+    }
+
+    public void addFocusView(AbsListView group) {
+        mHandler.addFocusView(group);
+    }
+
+    public void addPreparedFocusView(View view) {
+        mHandler.addPreparedFocusView(view);
+    }
+    public void addPreparedFocusView(View view,int position) {
+        mHandler.addPreparedFocusView(view,position);
+    }
+//    @Override
+//    public boolean dispatchKeyEvent(KeyEvent event) {
+//        switch (event.getAction()) {
+//            case KeyEvent.ACTION_DOWN:
+//                switch (event.getKeyCode()){
+//                    case KeyEvent.KEYCODE_DPAD_UP:
+//                        return true;
+//                    case KeyEvent.KEYCODE_DPAD_DOWN:
+//                        return true;
+//                    case KeyEvent.KEYCODE_ENTER:
+//                        return true;
+//                    default:
+//                        return super.dispatchKeyEvent(event);
+//                }
+//            case KeyEvent.ACTION_UP:
+//                switch (event.getKeyCode()) {
+//                    case KeyEvent.KEYCODE_DPAD_UP:
+//                        mCurrentFocusView = mCurrentFocusView.mUpFocusView;
+//                        setFocus(View.FOCUS_UP);
+//                        break;
+//                    case KeyEvent.KEYCODE_DPAD_DOWN:
+//                        mCurrentFocusView = mCurrentFocusView.mDownFocusView;
+//                        setFocus(View.FOCUS_DOWN);
+//                        break;
+//                    case KeyEvent.KEYCODE_ENTER:
+//                        mCurrentFocusView.mFocusView.performClick();
+//                        break;
+//                    default:
+//                        return super.dispatchKeyEvent(event);
+//                }
+//                return true;
+//            default:
+//                break;
+//        }
+//        return super.dispatchKeyEvent(event);
+//    }
+
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        switch (event.getAction()) {
-            case KeyEvent.ACTION_UP:
-                switch (event.getKeyCode()) {
-                    case KeyEvent.KEYCODE_DPAD_UP:
-                        mCurrentFocusView = mCurrentFocusView.mUpFocusView;
-                        setFocus(View.FOCUS_UP);
-                        break;
-                    case KeyEvent.KEYCODE_DPAD_DOWN:
-                        mCurrentFocusView = mCurrentFocusView.mDownFocusView;
-                        setFocus(View.FOCUS_DOWN);
-                        break;
-                    case KeyEvent.KEYCODE_ENTER:
-                        mCurrentFocusView.mFocusView.performClick();
-                        break;
-                    default:
-                        return super.dispatchKeyEvent(event);
-                }
-                return true;
-            default:
-                break;
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (mHandler.handleKeyEvent(keyCode,event)){
+            return true;
         }
-        return super.dispatchKeyEvent(event);
+
+        return super.onKeyDown(keyCode, event);
     }
 
     public abstract ViewGroup getContentViewGroup();
@@ -77,6 +112,6 @@ public abstract class BaseFoucsHandlerActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        getContentViewGroup().clearFocus();
+        mHandler.clearAllFocus();
     }
 }
