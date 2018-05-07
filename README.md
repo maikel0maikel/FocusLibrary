@@ -3,7 +3,30 @@
 思想从ViewGroup中按顺序添加有设置onClickListener的View做成双向循环列表
 按上下键相应的View会获取焦点，按确认键会执行onClick事件
 使用步骤
-一、activity中继承BaseFoucsHandlerActivity
+一、在根目录的build.gradle里添加仓库。
+```groovy
+allprojects {
+ repositories {
+        maven {
+             url "https://raw.githubusercontent.com/maikel0maikel/FocusLibrary/master"
+         }
+ }
+```
+二、在模块的build.gradle中添加依赖。
+
+studio3.0以下
+```groovy
+dependencies {
+     compile 'com.sinohb.lib:keyeventhandle:1.1.0'
+}
+```
+ studio3.0以上（含3.0）
+ ```groovy
+ dependencies {
+      implementation 'com.sinohb.lib:keyeventhandle:1.1.0'
+ }
+```
+三、activity中使用继承BaseFoucsHandlerActivity
 ```java
 public class MainActivity extends BaseFoucsHandlerActivity
 
@@ -32,7 +55,7 @@ public class MainActivity extends BaseFoucsHandlerActivity
         addFilterListenerView(ViewGroup);//该方法会过滤没有Listener的View
     }
 ```
-二、fragment中继承BaseFocusFragment（偏好设置的继承BaseFocusPreferenceFragment）
+二、fragment中使用继承BaseFocusFragment（偏好设置的继承BaseFocusPreferenceFragment）
 ```java
          @Override
         public ViewGroup getContentViewGroup() {
@@ -58,7 +81,7 @@ public class MainActivity extends BaseFoucsHandlerActivity
         addFilterListenerView(ViewGroup);//该方法会过滤没有Listener的View
     }
 ```
-三、popupWindow中继承BaseFocusPopupWindow
+三、popupWindow中使用继承BaseFocusPopupWindow
 ```java
     @Override
     public void showAtLocation(View parent, int gravity, int x, int y) {

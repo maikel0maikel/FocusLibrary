@@ -146,7 +146,7 @@ public class KeyEventHandler {
         RecyclerView recyclerView = (RecyclerView) mCurrentFocusView.mFocusView;
         LinearLayoutManager manager = (LinearLayoutManager) recyclerView.getLayoutManager();
         recyclerView.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);
-        manager.setStackFromEnd(true);
+//        manager.setStackFromEnd(true);
         manager.scrollToPosition(pos);
         View view = manager.findViewByPosition(pos);
         if (view != null) {
