@@ -39,6 +39,12 @@ public class FragmentFour extends BaseFocusFragment {
         mActivity = (Activity) context;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        addPreparedFocusView(getContentViewGroup());
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

@@ -2,7 +2,8 @@
 按鍵统一处理
 思想从ViewGroup中按顺序添加有设置onClickListener的View做成双向循环列表
 按上下键相应的View会获取焦点，按确认键会执行onClick事件
-使用步骤
+使用步骤：
+```
 一、在根目录的build.gradle里添加仓库。
 ```groovy
 allprojects {
@@ -55,7 +56,7 @@ public class MainActivity extends BaseFoucsHandlerActivity
         addFilterListenerView(ViewGroup);//该方法会过滤没有Listener的View
     }
 ```
-二、fragment中使用继承BaseFocusFragment（偏好设置的继承BaseFocusPreferenceFragment）
+四、fragment中使用继承BaseFocusFragment（偏好设置的继承BaseFocusPreferenceFragment）
 ```java
          @Override
         public ViewGroup getContentViewGroup() {
@@ -81,7 +82,7 @@ public class MainActivity extends BaseFoucsHandlerActivity
         addFilterListenerView(ViewGroup);//该方法会过滤没有Listener的View
     }
 ```
-三、popupWindow中使用继承BaseFocusPopupWindow
+五、popupWindow中使用继承BaseFocusPopupWindow
 ```java
     @Override
     public void showAtLocation(View parent, int gravity, int x, int y) {
@@ -100,4 +101,54 @@ public class MainActivity extends BaseFoucsHandlerActivity
            .....
     }
   ```
+注意：
+如果两个View公用一个list时，需要做处理
+如：
+ onClick 中
+    ```java
+    switch(id){
+        case btn1:
+            if(btn1.isSelected()){//已经选中状态无需处理
+                return;
+            }
+            remove(mRecyclerView);
+            int btn1Pos = findView(btn1);
+            addPreparedFocusView(RecyclerView,btn1Pos);
+            break;
+        case btn2:
+             if(btn2.isSelected()){//已经选中状态无需处理
+                  return;
+              }
+             remove(mRecyclerView);
+             int btn2Pos = findView(btn1);
+             addPreparedFocusView(RecyclerView,btn2Pos);
+            break;
+    }
 
+
+```
+举例： 一个返回键，左边一个listView，右边Fragment里装一个listView：
+Activity.java
+    ```java
+       @Override
+        protected void onStart() {
+            super.onStart();
+            //按钮顺序，按需求的顺序添加即可
+            //复杂的布局中可以如下使用
+            addPreparedFocusView(findViewById(backId));//或者addPreparedFocusView(backBtn)
+            addPreparedFocusView(ListView);//左边listView
+            .....
+
+        }
+
+    ```
+Fragment.java
+    ```java
+       @Override
+        protected void onStart() {
+            super.onStart();
+            addPreparedFocusView(ListView);//左边listView
+            .....
+        }
+
+    ```
