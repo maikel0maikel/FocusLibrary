@@ -18,14 +18,14 @@ allprojects {
 studio3.0以下
 ```groovy
 dependencies {
-     compile 'com.sinohb.lib:keyeventhandle:1.1.3'
+     compile 'com.sinohb.lib:keyeventhandle:1.1.4'
 
 }
 ```
  studio3.0以上（含3.0）
  ```groovy
  dependencies {
-      implementation 'com.sinohb.lib:keyeventhandle:1.1.3'
+      implementation 'com.sinohb.lib:keyeventhandle:1.1.4'
 
  }
 ```
@@ -160,3 +160,4 @@ Fragment.java
 implementation 'com.zhy:autolayout:1.4.5'
 implementation 'com.android.support:recyclerview-v7:23.0.1'
 ```
+注意：如果代码中设置了view的enable为false会影响焦点的获取
