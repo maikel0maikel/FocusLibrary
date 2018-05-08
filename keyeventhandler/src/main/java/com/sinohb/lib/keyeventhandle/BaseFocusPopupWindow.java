@@ -13,7 +13,7 @@ import com.sinohb.lib.keyeventhandle.bean.FocusView;
 public abstract class BaseFocusPopupWindow extends PopupWindow implements View.OnKeyListener {
     protected LinkedFocusViewStack<View> mFocusViews = new LinkedFocusViewStack<>();
     private FocusView<View> mCurrentFocusView;
-
+    private int mPosition = -1;
     public BaseFocusPopupWindow(Context context) {
         super(context);
         setFocusable(true);
@@ -25,14 +25,29 @@ public abstract class BaseFocusPopupWindow extends PopupWindow implements View.O
         if (KeyEvent.ACTION_DOWN == event.getAction()) {
             switch (keyCode) {
                 case KeyEvent.KEYCODE_DPAD_UP:
+                    if (mPosition == -1) {
+                        mCurrentFocusView = mFocusViews.get(0);
+                        startFocusPosition(0);
+                        mPosition = 0;
+                        return true;
+                    }
                     mCurrentFocusView = mCurrentFocusView.mUpFocusView;
                     setFocus(View.FOCUS_UP);
                     return true;
                 case KeyEvent.KEYCODE_DPAD_DOWN:
+                    if (mPosition == -1) {
+                        mCurrentFocusView = mFocusViews.get(0);
+                        startFocusPosition(0);
+                        mPosition = 0;
+                        return true;
+                    }
                     mCurrentFocusView = mCurrentFocusView.mDownFocusView;
                     setFocus(View.FOCUS_DOWN);
                     return true;
                 case KeyEvent.KEYCODE_ENTER:
+                    if (mPosition == -1) {
+                        return false;
+                    }
                     if (mCurrentFocusView.mFocusView instanceof AbsListView) {
                         return false;
                     } else {
@@ -93,13 +108,17 @@ public abstract class BaseFocusPopupWindow extends PopupWindow implements View.O
         if (mCurrentFocusView.mUpFocusView == null) {
             return;
         }
-//        mCurrentFocusView.mFocusView.setFocusableInTouchMode(true);
-//        mCurrentFocusView.mFocusView.requestFocusFromTouch();
+        mCurrentFocusView.mFocusView.setFocusableInTouchMode(true);
         mCurrentFocusView.mFocusView.setFocusable(true);
+        mCurrentFocusView.mFocusView.requestFocusFromTouch();
         mCurrentFocusView.mFocusView.requestFocus();
     }
 
     public void startFocusPosition(int position) {
+        if (position<0){
+            position = 0;
+        }
+        mPosition = 0;
         this.mCurrentFocusView = this.mFocusViews.get(position);
         this.setFocus(View.FOCUS_DOWN);
     }
@@ -107,13 +126,24 @@ public abstract class BaseFocusPopupWindow extends PopupWindow implements View.O
     public void addPreparedFocusView(View view) {
         mFocusViews.add(view);
         view.setOnKeyListener(this);
+        view.setOnFocusChangeListener(new FocusListener());
     }
 
+    static class FocusListener implements View.OnFocusChangeListener {
 
+        @Override
+        public void onFocusChange(View v, boolean hasFocus) {
+            if (!hasFocus) {
+                v.setFocusableInTouchMode(false);
+                v.setFocusable(false);
+            }
+        }
+    }
     @Override
     public void dismiss() {
         super.dismiss();
         mFocusViews.clear();
+        mPosition = -1;
     }
 //    @Override
 //    public void showAtLocation(View parent, int gravity, int x, int y) {

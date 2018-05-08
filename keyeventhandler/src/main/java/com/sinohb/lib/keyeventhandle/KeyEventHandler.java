@@ -20,6 +20,7 @@ public class KeyEventHandler {
     private int recycleViewMoveDeration;
     private int recycleFocusPos;
     private boolean isHandleRecyclerView = false;
+    private View recycleFocusView = null;
     //private int recycleViewChildCount = 0;
     //    private List<View> mListViews = new ArrayList<>();
 //    private boolean isPause = false;
@@ -67,6 +68,9 @@ public class KeyEventHandler {
                 }
                 if (mCurrentFocusView.mFocusView instanceof AbsListView) {
                     return false;
+                } else if (isHandleRecyclerView && recycleFocusView != null) {
+                    recycleFocusView.performClick();
+                    recycleFocusView.requestFocus();
                 } else {
                     mCurrentFocusView.mFocusView.performClick();
                 }
@@ -123,10 +127,26 @@ public class KeyEventHandler {
 
     private void handleListView(int deration) {
         AbsListView listView = (AbsListView) mCurrentFocusView.mFocusView;
-        if (deration == View.FOCUS_DOWN) {
-            listView.setSelection(0);
+        if (listView == null){
+            setFocus(deration);
+            return;
+        }
+        /**
+         * 防止多个button共用一个ListView，其中一个button没有列表把recycleView设置为不可见但是又不清空数据的情况
+         */
+        if (listView.getVisibility()!= View.VISIBLE){
+            setFocus(deration);
+            return;
+        }
+        int count = listView.getCount();
+        if (count > 0) {
+            if (deration == View.FOCUS_DOWN) {
+                listView.setSelection(0);
+            } else {
+                listView.setSelection(listView.getCount() - 1);
+            }
         } else {
-            listView.setSelection(listView.getCount() - 1);
+            setFocus(deration);
         }
     }
 
@@ -139,6 +159,17 @@ public class KeyEventHandler {
             return;
         }
         RecyclerView recyclerView = (RecyclerView) mCurrentFocusView.mFocusView;
+        if (recyclerView == null){
+            isHandleRecyclerView = false;
+            return;
+        }
+        /**
+         * 防止多个button共用一个recycleView，其中一个button没有列表把recycleView设置为不可见但是又不清空数据的情况
+         */
+        if (recyclerView.getVisibility() != View.VISIBLE){
+            isHandleRecyclerView = false;
+            return;
+        }
         int  recycleViewChildCount = recyclerView.getAdapter().getItemCount();
         if (pos >= recycleViewChildCount && deration == View.FOCUS_DOWN) {
             isHandleRecyclerView = false;
@@ -155,13 +186,18 @@ public class KeyEventHandler {
             view.setFocusable(true);
             view.requestFocusFromTouch();
             view.requestFocus();
-        }else {
-            if (deration == View.FOCUS_DOWN){
+            view.setOnFocusChangeListener(new FocusListener());
+        } else {
+            if (deration == View.FOCUS_DOWN) {
                 recycleFocusPos--;
             }else {
                 recycleFocusPos++;
             }
         }
+        if (recycleFocusPos<-1||recycleFocusPos>recycleViewChildCount){
+            isHandleRecyclerView = false;
+        }
+        recycleFocusView = view;
     }
 
 
@@ -239,54 +275,23 @@ public class KeyEventHandler {
 //        if (!isPause){
 //            mListViews.add(view);
 //        }
-        view.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    v.setFocusableInTouchMode(false);
-                }
-//                else if (view instanceof RecyclerView){
-////                    RecyclerView recyclerView = (RecyclerView) view;
-////                    LinearLayoutManager manager = (LinearLayoutManager) recyclerView.getLayoutManager();
-////                    recyclerView.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);
-////                    manager.setStackFromEnd(true);
-////                    int pos = 0;
-////                    if (recyclerView.getAdapter().getItemCount() > 0) {
-////                        if (recycleViewMoveDeration == View.FOCUS_DOWN) {
-////                            pos = 0;
-////                        } else {
-////                            pos = recyclerView.getAdapter().getItemCount() - 1;
-////                        }
-////                        View view = manager.findViewByPosition(3);
-////                        if (view!=null){
-////                            view.setFocusable(true);
-////                            view.requestFocus();
-////                            recyclerView.smoothScrollToPosition(3);
-////                        }
-////                    }
-//                    RecyclerView recyclerView = (RecyclerView) mCurrentFocusView.mFocusView;
-//                    recycleViewChildCount = recyclerView.getAdapter().getItemCount();
-//                    if (recycleViewMoveDeration == View.FOCUS_DOWN) {
-//                        recycleFocusPos = 0;
-//                    } else {
-//                        recycleFocusPos = recycleViewChildCount - 1;
-//                    }
-//                    handleRecyclerViewItemFocus(recycleFocusPos, recycleViewMoveDeration);
-//                }
+        view.setOnFocusChangeListener(new FocusListener());
+    }
+
+    static class FocusListener implements View.OnFocusChangeListener {
+
+        @Override
+        public void onFocusChange(View v, boolean hasFocus) {
+            if (!hasFocus) {
+                v.setFocusableInTouchMode(false);
+                v.setFocusable(false);
             }
-        });
+        }
     }
 
     public void addPreparedFocusView(final View view, int postion) {
         mFocusViews.add(postion, view);
-        view.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    v.setFocusableInTouchMode(false);
-                }
-            }
-        });
+        view.setOnFocusChangeListener(new FocusListener());
     }
 
     public void addPreparedFocusGroup(ViewGroup group) {
