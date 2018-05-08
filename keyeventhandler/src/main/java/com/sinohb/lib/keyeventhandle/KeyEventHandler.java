@@ -20,7 +20,7 @@ public class KeyEventHandler {
     private int recycleViewMoveDeration;
     private int recycleFocusPos;
     private boolean isHandleRecyclerView = false;
-    private int recycleViewChildCount = 0;
+    //private int recycleViewChildCount = 0;
     //    private List<View> mListViews = new ArrayList<>();
 //    private boolean isPause = false;
     private boolean isSetFocusInTouch;
@@ -103,7 +103,7 @@ public class KeyEventHandler {
                 handleListView(deration);
             } else if (mCurrentFocusView.mFocusView instanceof RecyclerView) {
                 RecyclerView recyclerView = (RecyclerView) mCurrentFocusView.mFocusView;
-                recycleViewChildCount = recyclerView.getAdapter().getItemCount();
+              int  recycleViewChildCount = recyclerView.getAdapter().getItemCount();
                 if (recycleViewChildCount > 0) {
                     isHandleRecyclerView = true;
                     if (deration == View.FOCUS_DOWN) {
@@ -138,16 +138,16 @@ public class KeyEventHandler {
             setFocus(View.FOCUS_UP);
             return;
         }
+        RecyclerView recyclerView = (RecyclerView) mCurrentFocusView.mFocusView;
+        int  recycleViewChildCount = recyclerView.getAdapter().getItemCount();
         if (pos >= recycleViewChildCount && deration == View.FOCUS_DOWN) {
             isHandleRecyclerView = false;
             mCurrentFocusView = mCurrentFocusView.mDownFocusView;
             setFocus(View.FOCUS_DOWN);
             return;
         }
-        RecyclerView recyclerView = (RecyclerView) mCurrentFocusView.mFocusView;
         LinearLayoutManager manager = (LinearLayoutManager) recyclerView.getLayoutManager();
         recyclerView.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);
-//        manager.setStackFromEnd(true);
         manager.scrollToPosition(pos);
         View view = manager.findViewByPosition(pos);
         if (view != null) {
@@ -155,7 +155,12 @@ public class KeyEventHandler {
             view.setFocusable(true);
             view.requestFocusFromTouch();
             view.requestFocus();
-//            manager.scrollToPositionWithOffset(pos,0);
+        }else {
+            if (deration == View.FOCUS_DOWN){
+                recycleFocusPos--;
+            }else {
+                recycleFocusPos++;
+            }
         }
     }
 

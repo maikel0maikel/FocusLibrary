@@ -18,15 +18,15 @@ allprojects {
 studio3.0以下
 ```groovy
 dependencies {
-     compile 'com.sinohb.lib:keyeventhandle:1.1.2'
-     compile 'com.android.support:recyclerview-v7:23.0.1'//加上这个是因为有些项目用了recyclerview，所以要适配
+     compile 'com.sinohb.lib:keyeventhandle:1.1.3'
+
 }
 ```
  studio3.0以上（含3.0）
  ```groovy
  dependencies {
-      implementation 'com.sinohb.lib:keyeventhandle:1.1.2'
-      compile 'com.android.support:recyclerview-v7:23.0.1'//加上这个是因为有些项目用了recyclerview，所以要适配
+      implementation 'com.sinohb.lib:keyeventhandle:1.1.3'
+
  }
 ```
 三、activity中使用继承BaseFoucsHandlerActivity
@@ -107,7 +107,7 @@ public class MainActivity extends BaseFoucsHandlerActivity
 如果两个View公用一个list时，需要做处理
 如：
  onClick 中
-    ```java
+```java
     switch(id){
         case btn1:
             if(btn1.isSelected()){//已经选中状态无需处理
@@ -126,12 +126,12 @@ public class MainActivity extends BaseFoucsHandlerActivity
              addPreparedFocusView(RecyclerView,btn2Pos);
             break;
     }
+  ```
 
 
-```
 举例： 一个返回键，左边一个listView，右边Fragment里装一个listView：
 Activity.java
-    ```java
+```java
        @Override
         protected void onStart() {
             super.onStart();
@@ -143,9 +143,9 @@ Activity.java
 
         }
 
-    ```
+  ```
 Fragment.java
-    ```java
+```java
        @Override
         protected void onStart() {
             super.onStart();
@@ -153,4 +153,10 @@ Fragment.java
             .....
         }
 
-    ```
+  ```
+备注：
+为了防止报错依赖增加了两个依赖，因此主工程不需要添加如下依赖了：
+```groovy
+implementation 'com.zhy:autolayout:1.4.5'
+implementation 'com.android.support:recyclerview-v7:23.0.1'
+```
