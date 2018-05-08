@@ -149,7 +149,7 @@ Fragment.java
        @Override
         protected void onStart() {
             super.onStart();
-            addPreparedFocusView(ListView);//左边listView
+            addPreparedFocusView(ListView);//listView
             .....
         }
 
