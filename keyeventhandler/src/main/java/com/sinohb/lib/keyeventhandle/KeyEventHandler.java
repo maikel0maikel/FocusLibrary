@@ -1,11 +1,15 @@
 package com.sinohb.lib.keyeventhandle;
 
+import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ListView;
 
@@ -17,7 +21,7 @@ public class KeyEventHandler {
     protected LinkedFocusViewStack<View> mFocusViews = new LinkedFocusViewStack<>();
     private FocusView<View> mCurrentFocusView;
     private int mPosition = -1;
-    private int recycleViewMoveDeration;
+    //private int recycleViewMoveDeration;
     private int recycleFocusPos;
     private boolean isHandleRecyclerView = false;
     private View recycleFocusView = null;
@@ -37,11 +41,11 @@ public class KeyEventHandler {
                 }
                 if (isHandleRecyclerView) {
                     recycleFocusPos--;
-                    recycleViewMoveDeration = View.FOCUS_UP;
+                    //recycleViewMoveDeration = View.FOCUS_UP;
                     handleRecyclerViewItemFocus(recycleFocusPos, View.FOCUS_UP);
                     return true;
                 }
-                recycleViewMoveDeration = View.FOCUS_UP;
+                //recycleViewMoveDeration = View.FOCUS_UP;
                 mCurrentFocusView = mCurrentFocusView.mUpFocusView;
                 setFocus(View.FOCUS_UP);
                 break;
@@ -54,11 +58,11 @@ public class KeyEventHandler {
                 }
                 if (isHandleRecyclerView) {
                     recycleFocusPos++;
-                    recycleViewMoveDeration = View.FOCUS_DOWN;
+                    //recycleViewMoveDeration = View.FOCUS_DOWN;
                     handleRecyclerViewItemFocus(recycleFocusPos, View.FOCUS_DOWN);
                     return true;
                 }
-                recycleViewMoveDeration = View.FOCUS_DOWN;
+                //recycleViewMoveDeration = View.FOCUS_DOWN;
                 mCurrentFocusView = mCurrentFocusView.mDownFocusView;
                 setFocus(View.FOCUS_DOWN);
                 break;
@@ -75,7 +79,13 @@ public class KeyEventHandler {
                     if (mCurrentFocusView.mFocusView == null){
                         return false;
                     }
-                    mCurrentFocusView.mFocusView.performClick();
+                    if (mCurrentFocusView.mFocusView.hasOnClickListeners()) {
+                        mCurrentFocusView.mFocusView.performClick();
+                    } else {
+                        if (mCurrentFocusView.mFocusView instanceof ViewGroup) {
+                            performClick((ViewGroup)mCurrentFocusView.mFocusView);
+                        }
+                    }
                 }
                 break;
             default:
@@ -83,7 +93,20 @@ public class KeyEventHandler {
         }
         return true;
     }
-
+    private void performClick(ViewGroup group) {
+        int childCount = group.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View view = group.getChildAt(i);
+            if (view == null) {
+                continue;
+            }
+            if (view instanceof ViewGroup){
+                performClick((ViewGroup) view);
+            }else {
+                view.performClick();
+            }
+        }
+    }
     public void setFocus(int deration) {
         if (mCurrentFocusView == null) {
             if (mFocusViews.isEmpty()) {
@@ -330,5 +353,50 @@ public class KeyEventHandler {
 
     public void setSetFocusInTouch(boolean focusInTouch) {
         this.isSetFocusInTouch = focusInTouch;
+    }
+
+
+    public  void handleEdittext(final EditText view) {
+        view.setFocusableInTouchMode(true);
+        view.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    view.setFocusableInTouchMode(true);
+                    view.setFocusable(true);
+                    view.requestFocus();
+                    return true;
+                }
+                return false;
+            }
+        });
+        view.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    switch (keyCode) {
+                        case KeyEvent.KEYCODE_DPAD_UP:
+                        case KeyEvent.KEYCODE_DPAD_DOWN:
+                        case KeyEvent.KEYCODE_ENTER:
+                            InputMethodManager imm = (InputMethodManager) v
+                                    .getContext().getSystemService(
+                                            Context.INPUT_METHOD_SERVICE);
+                            if (imm.isActive()) {
+                                imm.hideSoftInputFromWindow(
+                                        view.getWindowToken(), 0);
+                            }
+                            v.setFocusableInTouchMode(false);
+                            v.setFocusable(false);
+                            return true;
+                        default:
+                            view.setFocusableInTouchMode(true);
+                            view.setFocusable(true);
+                            view.requestFocus();
+                            return true;
+                    }
+                }
+                return false;
+            }
+        });
     }
 }

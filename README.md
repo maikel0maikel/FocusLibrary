@@ -102,7 +102,7 @@ public class MainActivity extends BaseFoucsHandlerActivity
            addPreparedFocusView(layout3);
            .....
     }
-  ```
+```
 注意：
 如果两个View公用一个list时，需要做处理
 如：
@@ -126,7 +126,7 @@ public class MainActivity extends BaseFoucsHandlerActivity
              addPreparedFocusView(RecyclerView,btn2Pos);
             break;
     }
-  ```
+```
 
 
 举例： 一个返回键，左边一个listView，右边Fragment里装一个listView：
@@ -143,7 +143,7 @@ Activity.java
 
         }
 
-  ```
+ ```
 Fragment.java
 ```java
        @Override
@@ -153,11 +153,17 @@ Fragment.java
             .....
         }
 
-  ```
+```
 备注：
 为了防止报错依赖增加了两个依赖，因此主工程不需要添加如下依赖了：
 ```groovy
 implementation 'com.zhy:autolayout:1.4.5'
 implementation 'com.android.support:recyclerview-v7:23.0.1'
 ```
-注意：如果代码中设置了view的enable为false会影响焦点的获取
+注意：如果代码中设置了view的enable为false会影响焦点的获取，对于有edittext的情况需要对edittext做处理
+处理方式为：
+```java
+addPreparedFocusView(View);
+...
+handleEdittext(Edittext);
+```

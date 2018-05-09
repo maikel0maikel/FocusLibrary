@@ -4,6 +4,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.EditText;
 
 import com.zhy.autolayout.AutoLayoutActivity;
 
@@ -53,6 +54,9 @@ public abstract class BaseFoucsHandlerActivity extends AutoLayoutActivity {
     }
     public void addPreparedFocusView(View view,int position) {
         mHandler.addPreparedFocusView(view,position);
+    }
+    public void handleEdittext(EditText editText) {
+        mHandler.handleEdittext(editText);
     }
 //    @Override
 //    public boolean dispatchKeyEvent(KeyEvent event) {
