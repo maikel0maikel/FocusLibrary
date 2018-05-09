@@ -72,6 +72,9 @@ public class KeyEventHandler {
                     recycleFocusView.performClick();
                     recycleFocusView.requestFocus();
                 } else {
+                    if (mCurrentFocusView.mFocusView == null){
+                        return false;
+                    }
                     mCurrentFocusView.mFocusView.performClick();
                 }
                 break;

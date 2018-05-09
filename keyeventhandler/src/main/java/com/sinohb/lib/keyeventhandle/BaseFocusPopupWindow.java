@@ -51,6 +51,9 @@ public abstract class BaseFocusPopupWindow extends PopupWindow implements View.O
                     if (mCurrentFocusView.mFocusView instanceof AbsListView) {
                         return false;
                     } else {
+                        if (mCurrentFocusView.mFocusView == null){
+                            return false;
+                        }
                         if (mCurrentFocusView.mFocusView.hasOnClickListeners()) {
                             mCurrentFocusView.mFocusView.performClick();
                         } else {
