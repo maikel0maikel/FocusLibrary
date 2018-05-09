@@ -389,10 +389,12 @@ public class KeyEventHandler {
                             v.setFocusable(false);
                             return true;
                         default:
-                            view.setFocusableInTouchMode(true);
-                            view.setFocusable(true);
-                            view.requestFocus();
-                            return true;
+                            if (!view.hasFocus()){
+                                view.setFocusableInTouchMode(true);
+                                view.setFocusable(true);
+                                view.requestFocus();
+                            }
+                            return false;
                     }
                 }
                 return false;
