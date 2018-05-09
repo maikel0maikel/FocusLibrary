@@ -18,14 +18,14 @@ allprojects {
 studio3.0以下
 ```groovy
 dependencies {
-     compile 'com.sinohb.lib:keyeventhandle:1.1.5'
+     compile 'com.sinohb.lib:keyeventhandle:1.1.6'
 
 }
 ```
  studio3.0以上（含3.0）
  ```groovy
  dependencies {
-      implementation 'com.sinohb.lib:keyeventhandle:1.1.5'
+      implementation 'com.sinohb.lib:keyeventhandle:1.1.6'
 
  }
 ```
