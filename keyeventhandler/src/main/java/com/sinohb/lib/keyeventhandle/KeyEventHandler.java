@@ -3,6 +3,7 @@ package com.sinohb.lib.keyeventhandle;
 import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -14,6 +15,10 @@ import android.widget.GridView;
 import android.widget.ListView;
 
 import com.sinohb.lib.keyeventhandle.bean.FocusView;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 
 public class KeyEventHandler {
@@ -107,10 +112,10 @@ public class KeyEventHandler {
             }
         }
     }
-    public void setFocus(int deration) {
+    public boolean setFocus(int deration) {
         if (mCurrentFocusView == null) {
             if (mFocusViews.isEmpty()) {
-                return;
+                return false;
             }
             mCurrentFocusView = mFocusViews.get(0);
         }
@@ -122,7 +127,7 @@ public class KeyEventHandler {
             }
         }
         if (mCurrentFocusView.mFocusView == null) {
-            return;
+            return false;
         }
         mCurrentFocusView.mFocusView.setFocusableInTouchMode(true);
         mCurrentFocusView.mFocusView.requestFocusFromTouch();
@@ -131,6 +136,7 @@ public class KeyEventHandler {
         if (mCurrentFocusView.mFocusView instanceof ViewGroup) {
             if (isListGroup(mCurrentFocusView.mFocusView)) {
                 handleListView(deration);
+                return false;
             } else if (mCurrentFocusView.mFocusView instanceof RecyclerView) {
                 RecyclerView recyclerView = (RecyclerView) mCurrentFocusView.mFocusView;
               int  recycleViewChildCount = recyclerView.getAdapter().getItemCount();
@@ -142,12 +148,17 @@ public class KeyEventHandler {
                         recycleFocusPos = recycleViewChildCount - 1;
                     }
                     handleRecyclerViewItemFocus(recycleFocusPos, deration);
+                    return true;
                 }else {
                     isHandleRecyclerView = false;
+                    return false;
                 }
             }else {
                 isHandleRecyclerView = false;
+                return false;
             }
+        }else {
+            return true;
         }
     }
 
@@ -401,4 +412,39 @@ public class KeyEventHandler {
             }
         });
     }
+    private void hook(View view){
+        try {
+            Method getLinstenerInfo = View.class.getDeclaredMethod("getListenerInfo");
+            getLinstenerInfo.setAccessible(true);
+            Object listenerInfo = getLinstenerInfo.invoke(view);
+            Class<?> listenerInfoClz = Class.forName("android.view.View$ListenerInfo");
+            Field mOnclickListener = listenerInfoClz.getDeclaredField("mOnTouchListener");
+            mOnclickListener.setAccessible(true);
+            View.OnTouchListener originOnTouchListener = (View.OnTouchListener) mOnclickListener.get(listenerInfo);
+            HookListener hookListener = new HookListener(originOnTouchListener);
+            mOnclickListener.set(listenerInfo,hookListener);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+    }
+    class HookListener implements View.OnTouchListener{
+        private View.OnTouchListener listener;
+        public HookListener(View.OnTouchListener listener){
+            this.listener = listener;
+        }
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            return listener.onTouch(v,event);
+        }
+    }
+
 }
