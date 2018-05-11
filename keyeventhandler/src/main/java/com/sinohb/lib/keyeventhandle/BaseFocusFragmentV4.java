@@ -1,14 +1,14 @@
 package com.sinohb.lib.keyeventhandle;
 
-import android.app.Fragment;
 import android.content.Context;
+import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 
 import java.util.List;
 
-public abstract class BaseFocusFragment extends Fragment {
+public abstract class BaseFocusFragmentV4 extends Fragment {
 
     public abstract ViewGroup getContentViewGroup();
 

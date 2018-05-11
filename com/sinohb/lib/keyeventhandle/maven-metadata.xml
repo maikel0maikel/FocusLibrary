@@ -3,12 +3,13 @@
   <groupId>com.sinohb.lib</groupId>
   <artifactId>keyeventhandle</artifactId>
   <versioning>
-    <release>1.1.7</release>
+    <release>1.1.8</release>
     <versions>
       <version>1.1.6</version>
       <version>1.1.5</version>
       <version>1.1.7</version>
+      <version>1.1.8</version>
     </versions>
-    <lastUpdated>20180509062404</lastUpdated>
+    <lastUpdated>20180511085234</lastUpdated>
   </versioning>
 </metadata>

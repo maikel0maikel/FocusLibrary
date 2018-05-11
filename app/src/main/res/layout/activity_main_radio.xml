@@ -85,18 +85,21 @@
             android:id="@+id/radio1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/focus_selector"
             android:text="radio1" />
 
         <RadioButton
             android:id="@+id/radio2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/focus_selector"
             android:text="radio2" />
 
         <RadioButton
             android:id="@+id/radio3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/focus_selector"
             android:text="radio3" />
     </RadioGroup>
 
