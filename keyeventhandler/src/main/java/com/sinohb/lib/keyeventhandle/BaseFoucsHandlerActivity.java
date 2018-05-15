@@ -58,18 +58,18 @@ public abstract class BaseFoucsHandlerActivity extends AutoLayoutActivity {
     public void handleEdittext(EditText editText) {
         mHandler.handleEdittext(editText);
     }
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        switch (event.getAction()) {
-            case KeyEvent.ACTION_DOWN:
-              if (mHandler.handleKeyEvent(event.getKeyCode(),event)){
-                  return true;
-              }
-            default:
-                break;
-        }
-        return super.dispatchKeyEvent(event);
-    }
+//    @Override
+//    public boolean dispatchKeyEvent(KeyEvent event) {
+//        switch (event.getAction()) {
+//            case KeyEvent.ACTION_DOWN:
+//              if (mHandler.handleKeyEvent(event.getKeyCode(),event)){
+//                  return true;
+//              }
+//            default:
+//                break;
+//        }
+//        return super.dispatchKeyEvent(event);
+//    }
 
 
 
@@ -78,14 +78,14 @@ public abstract class BaseFoucsHandlerActivity extends AutoLayoutActivity {
         super.onResume();
     }
 
-//    @Override
-//    public boolean onKeyDown(int keyCode, KeyEvent event) {
-//        if (mHandler.handleKeyEvent(keyCode,event)){
-//            return true;
-//        }
-//
-//        return super.onKeyDown(keyCode, event);
-//    }
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (mHandler.handleKeyEvent(keyCode,event)){
+            return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
 
     public abstract ViewGroup getContentViewGroup();
 

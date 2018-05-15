@@ -1,9 +1,9 @@
 package com.sinohb.lib.keyeventhandle;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -12,6 +12,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.sinohb.lib.keyeventhandle.bean.FocusView;
@@ -19,6 +20,7 @@ import com.sinohb.lib.keyeventhandle.bean.FocusView;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 
 
 public class KeyEventHandler {
@@ -34,6 +36,7 @@ public class KeyEventHandler {
     //    private List<View> mListViews = new ArrayList<>();
 //    private boolean isPause = false;
     private boolean isSetFocusInTouch;
+    private HashMap<Integer, Drawable> viewDrawableHashMap = new HashMap<>();
 
     public boolean handleKeyEvent(int keyCode, KeyEvent event) {
         switch (keyCode) {
@@ -81,23 +84,27 @@ public class KeyEventHandler {
                     recycleFocusView.performClick();
                     recycleFocusView.requestFocus();
                 } else {
-                    if (mCurrentFocusView.mFocusView == null){
+                    if (mCurrentFocusView.mFocusView == null) {
                         return false;
                     }
                     if (mCurrentFocusView.mFocusView.hasOnClickListeners()) {
                         mCurrentFocusView.mFocusView.performClick();
                     } else {
                         if (mCurrentFocusView.mFocusView instanceof ViewGroup) {
-                            performClick((ViewGroup)mCurrentFocusView.mFocusView);
+                            performClick((ViewGroup) mCurrentFocusView.mFocusView);
                         }
                     }
                 }
                 break;
             default:
+                if (mCurrentFocusView.mFocusView != null) {
+                    mCurrentFocusView.mFocusView.setFocusable(false);
+                }
                 return false;
         }
         return true;
     }
+
     private void performClick(ViewGroup group) {
         int childCount = group.getChildCount();
         for (int i = 0; i < childCount; i++) {
@@ -105,13 +112,14 @@ public class KeyEventHandler {
             if (view == null) {
                 continue;
             }
-            if (view instanceof ViewGroup){
+            if (view instanceof ViewGroup) {
                 performClick((ViewGroup) view);
-            }else {
+            } else {
                 view.performClick();
             }
         }
     }
+
     public boolean setFocus(int deration) {
         if (mCurrentFocusView == null) {
             if (mFocusViews.isEmpty()) {
@@ -139,7 +147,7 @@ public class KeyEventHandler {
                 return false;
             } else if (mCurrentFocusView.mFocusView instanceof RecyclerView) {
                 RecyclerView recyclerView = (RecyclerView) mCurrentFocusView.mFocusView;
-              int  recycleViewChildCount = recyclerView.getAdapter().getItemCount();
+                int recycleViewChildCount = recyclerView.getAdapter().getItemCount();
                 if (recycleViewChildCount > 0) {
                     isHandleRecyclerView = true;
                     if (deration == View.FOCUS_DOWN) {
@@ -149,29 +157,29 @@ public class KeyEventHandler {
                     }
                     handleRecyclerViewItemFocus(recycleFocusPos, deration);
                     return true;
-                }else {
+                } else {
                     isHandleRecyclerView = false;
                     return false;
                 }
-            }else {
+            } else {
                 isHandleRecyclerView = false;
                 return false;
             }
-        }else {
+        } else {
             return true;
         }
     }
 
     private void handleListView(int deration) {
         AbsListView listView = (AbsListView) mCurrentFocusView.mFocusView;
-        if (listView == null){
+        if (listView == null) {
             setFocus(deration);
             return;
         }
         /**
          * 防止多个button共用一个ListView，其中一个button没有列表把recycleView设置为不可见但是又不清空数据的情况
          */
-        if (listView.getVisibility()!= View.VISIBLE){
+        if (listView.getVisibility() != View.VISIBLE) {
             setFocus(deration);
             return;
         }
@@ -196,18 +204,18 @@ public class KeyEventHandler {
             return;
         }
         RecyclerView recyclerView = (RecyclerView) mCurrentFocusView.mFocusView;
-        if (recyclerView == null){
+        if (recyclerView == null) {
             isHandleRecyclerView = false;
             return;
         }
         /**
          * 防止多个button共用一个recycleView，其中一个button没有列表把recycleView设置为不可见但是又不清空数据的情况
          */
-        if (recyclerView.getVisibility() != View.VISIBLE){
+        if (recyclerView.getVisibility() != View.VISIBLE) {
             isHandleRecyclerView = false;
             return;
         }
-        int  recycleViewChildCount = recyclerView.getAdapter().getItemCount();
+        int recycleViewChildCount = recyclerView.getAdapter().getItemCount();
         if (pos >= recycleViewChildCount && deration == View.FOCUS_DOWN) {
             isHandleRecyclerView = false;
             mCurrentFocusView = mCurrentFocusView.mDownFocusView;
@@ -223,15 +231,23 @@ public class KeyEventHandler {
             view.setFocusable(true);
             view.requestFocusFromTouch();
             view.requestFocus();
-            view.setOnFocusChangeListener(new FocusListener());
+            view.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if (!hasFocus) {
+                        v.setFocusableInTouchMode(false);
+                        v.setFocusable(false);
+                    }
+                }
+            });
         } else {
             if (deration == View.FOCUS_DOWN) {
                 recycleFocusPos--;
-            }else {
+            } else {
                 recycleFocusPos++;
             }
         }
-        if (recycleFocusPos<-1||recycleFocusPos>recycleViewChildCount){
+        if (recycleFocusPos < -1 || recycleFocusPos > recycleViewChildCount) {
             isHandleRecyclerView = false;
         }
         recycleFocusView = view;
@@ -245,6 +261,7 @@ public class KeyEventHandler {
 
 
     public int remove(View view) {
+        viewDrawableHashMap.remove(view.getId());
         return mFocusViews.remove(view);
     }
 
@@ -255,6 +272,7 @@ public class KeyEventHandler {
     public void clearAllFocus() {
         mFocusViews.clear();
         mPosition = -1;
+        viewDrawableHashMap.clear();
     }
 
     public void addFocusView(ViewGroup group) {
@@ -312,23 +330,49 @@ public class KeyEventHandler {
 //        if (!isPause){
 //            mListViews.add(view);
 //        }
-        view.setOnFocusChangeListener(new FocusListener());
+        handlePreparedView(view);
     }
 
-    static class FocusListener implements View.OnFocusChangeListener {
+    private void handlePreparedView(View view) {
+        view.setOnFocusChangeListener(new FocusListener());
+        hookViewClickListener(view);
+    }
 
+    class FocusListener implements View.OnFocusChangeListener {
         @Override
         public void onFocusChange(View v, boolean hasFocus) {
             if (!hasFocus) {
                 v.setFocusableInTouchMode(false);
                 v.setFocusable(false);
+                if (isNoNeedSetBg(v)) {
+                    return;
+                }
+                setNormalBackground(v);
+            } else {
+                if (isNoNeedSetBg(v)) {
+                    return;
+                }
+                Drawable drawable = null;
+                if (v instanceof ImageView) {
+                    ImageView imageView = (ImageView) v;
+                    drawable = imageView.getDrawable();
+                } else {
+                    drawable = v.getBackground();
+                }
+                viewDrawableHashMap.put(v.getId(), drawable);
+                ShadowDrawable.setShadowDrawable(v);
             }
         }
     }
 
+    private boolean isNoNeedSetBg(View view) {
+
+        return (view instanceof AbsListView) || (view instanceof RecyclerView) || isHandleRecyclerView;
+    }
+
     public void addPreparedFocusView(final View view, int postion) {
         mFocusViews.add(postion, view);
-        view.setOnFocusChangeListener(new FocusListener());
+        handlePreparedView(view);
     }
 
     public void addPreparedFocusGroup(ViewGroup group) {
@@ -338,7 +382,7 @@ public class KeyEventHandler {
     }
 
     public void startFocusPosition(int position) {
-        if (position<0){
+        if (position < 0) {
             position = 0;
         }
         mPosition = 0;
@@ -367,7 +411,7 @@ public class KeyEventHandler {
     }
 
 
-    public  void handleEdittext(final EditText view) {
+    public void handleEdittext(final EditText view) {
         view.setFocusableInTouchMode(true);
         view.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -400,7 +444,7 @@ public class KeyEventHandler {
                             v.setFocusable(false);
                             return true;
                         default:
-                            if (!view.hasFocus()){
+                            if (!view.hasFocus()) {
                                 view.setFocusableInTouchMode(true);
                                 view.setFocusable(true);
                                 view.requestFocus();
@@ -412,17 +456,18 @@ public class KeyEventHandler {
             }
         });
     }
-    private void hook(View view){
+
+    private void hookViewTouchListener(View view) {
         try {
             Method getLinstenerInfo = View.class.getDeclaredMethod("getListenerInfo");
             getLinstenerInfo.setAccessible(true);
             Object listenerInfo = getLinstenerInfo.invoke(view);
             Class<?> listenerInfoClz = Class.forName("android.view.View$ListenerInfo");
-            Field mOnclickListener = listenerInfoClz.getDeclaredField("mOnTouchListener");
-            mOnclickListener.setAccessible(true);
-            View.OnTouchListener originOnTouchListener = (View.OnTouchListener) mOnclickListener.get(listenerInfo);
+            Field mOnTouchListener = listenerInfoClz.getDeclaredField("mOnTouchListener");
+            mOnTouchListener.setAccessible(true);
+            View.OnTouchListener originOnTouchListener = (View.OnTouchListener) mOnTouchListener.get(listenerInfo);
             HookListener hookListener = new HookListener(originOnTouchListener);
-            mOnclickListener.set(listenerInfo,hookListener);
+            mOnTouchListener.set(listenerInfo, hookListener);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -435,16 +480,75 @@ public class KeyEventHandler {
             e.printStackTrace();
         }
     }
-    class HookListener implements View.OnTouchListener{
+
+    class HookListener implements View.OnTouchListener {
         private View.OnTouchListener listener;
-        public HookListener(View.OnTouchListener listener){
+
+        public HookListener(View.OnTouchListener listener) {
             this.listener = listener;
         }
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            return listener.onTouch(v,event);
+            return listener.onTouch(v, event);
         }
     }
 
+    private void hookViewClickListener(View view) {
+        try {
+            Method getLinstenerInfo = View.class.getDeclaredMethod("getListenerInfo");
+            getLinstenerInfo.setAccessible(true);
+            Object listenerInfo = getLinstenerInfo.invoke(view);
+            Class<?> listenerInfoClz = Class.forName("android.view.View$ListenerInfo");
+            Field mOnclickListener = listenerInfoClz.getDeclaredField("mOnClickListener");
+            mOnclickListener.setAccessible(true);
+            View.OnClickListener originOnClickListener = (View.OnClickListener) mOnclickListener.get(listenerInfo);
+            HookOnClickListener hookListener = new HookOnClickListener(originOnClickListener);
+            mOnclickListener.set(listenerInfo, hookListener);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+    }
+
+    class HookOnClickListener implements View.OnClickListener {
+        private View.OnClickListener listener;
+
+        public HookOnClickListener(View.OnClickListener listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (!isHandleRecyclerView && v != mCurrentFocusView.mFocusView && mCurrentFocusView.mFocusView != null) {
+                mCurrentFocusView.mFocusView.setFocusable(false);
+                //mCurrentFocusView.mFocusView.setBackground(viewDrawableHashMap.get(mCurrentFocusView.mDownFocusView));
+            }
+            listener.onClick(v);
+            if (isNoNeedSetBg(v)) {
+                return;
+            }
+            setNormalBackground(v);
+        }
+    }
+
+    private void setNormalBackground(View v) {
+        Drawable drawable = viewDrawableHashMap.get(v.getId());
+        if (drawable != null) {
+            if (v instanceof ImageView) {
+                ImageView imageView = (ImageView) v;
+                imageView.setImageDrawable(drawable);
+            } else {
+                v.setBackground(null);
+                v.setBackground(drawable);
+            }
+        }
+    }
 }
