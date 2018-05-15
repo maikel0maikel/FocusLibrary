@@ -538,11 +538,14 @@ public class KeyEventHandler {
                 mCurrentFocusView.mFocusView.setFocusable(false);
                 //mCurrentFocusView.mFocusView.setBackground(viewDrawableHashMap.get(mCurrentFocusView.mDownFocusView));
             }
-            listener.onClick(v);
             if (isNoNeedSetBg(v)) {
                 return;
             }
             setNormalBackground(v);
+            if (listener == null){
+                return;
+            }
+            listener.onClick(v);
         }
     }
 

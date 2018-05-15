@@ -43,7 +43,7 @@ uploadArchives {
         pom.project {
             groupId "com.sinohb.lib" //groupId:artifactId:version
             artifactId "keyeventhandle" //LibA
-            version "1.2.0"
+            version "1.2.2"
         }
     }
 }
