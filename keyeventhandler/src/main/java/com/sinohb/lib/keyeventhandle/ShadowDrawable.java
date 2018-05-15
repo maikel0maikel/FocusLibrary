@@ -9,6 +9,7 @@ import android.graphics.PixelFormat;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -22,6 +23,7 @@ public class ShadowDrawable extends Drawable {
     private RectF mRectf;
     //Bitmap lightBg;
     Drawable mDrawable;
+
     private ShadowDrawable(View view) {
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
@@ -38,12 +40,12 @@ public class ShadowDrawable extends Drawable {
 
 //        mPaintOut.setColor(Color.YELLOW);
         this.view = view;
-       view.setDrawingCacheEnabled(true);
+        view.setDrawingCacheEnabled(true);
         bd = view.getDrawingCache();
-       // bd = loadBitmapFromView(view);
+        // bd = loadBitmapFromView(view);
         //view.setDrawingCacheEnabled(false);
         //lightBg = BitmapFactory.decodeResource(view.getContext().getResources(), R.mipmap.item_press_focus);
-        mRectf = new RectF(0,0,view.getMeasuredWidth(),view.getMeasuredHeight());
+        mRectf = new RectF(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
     }
 
     @Override
@@ -72,7 +74,7 @@ public class ShadowDrawable extends Drawable {
         mPaint.setStyle(Paint.Style.FILL);
         if (bd != null) {
             canvas.save();
-            canvas.scale(0.8f, 0.8f,view.getMeasuredWidth()/2,view.getMeasuredHeight()/2);
+            canvas.scale(0.8f, 0.8f, view.getMeasuredWidth() / 2, view.getMeasuredHeight() / 2);
             //canvas.translate(view.getMeasuredWidth()*0.2f, view.getMeasuredHeight()*0.2f);
             canvas.drawBitmap(bd, 0, 0, mPaint);
             //view.setDrawingCacheEnabled(false);
@@ -149,13 +151,16 @@ public class ShadowDrawable extends Drawable {
         ShadowDrawable drawable = new ShadowDrawable(view);
 
         view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        view.setBackground(null);
-        if (view instanceof ImageView){
+        if (view instanceof ImageView) {
             ImageView imageView = (ImageView) view;
             imageView.setImageDrawable(drawable);
-        }else {
-            view.setBackground(drawable);
+        } else {
+            if (Build.VERSION.SDK_INT >= 16) {
+                view.setBackground(drawable);
+            } else {
+                view.setBackgroundDrawable(drawable);
+            }
         }
-        //  ViewCompat.setBackground(view, drawable);
     }
+    //  ViewCompat.setBackground(view, drawable);
 }

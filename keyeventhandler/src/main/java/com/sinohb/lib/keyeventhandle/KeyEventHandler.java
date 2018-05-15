@@ -2,6 +2,7 @@ package com.sinohb.lib.keyeventhandle;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
@@ -42,6 +43,9 @@ public class KeyEventHandler {
         switch (keyCode) {
             case KeyEvent.KEYCODE_DPAD_UP:
                 if (mPosition == -1) {
+                    if (mFocusViews.isEmpty()) {
+                        return false;
+                    }
                     mCurrentFocusView = mFocusViews.get(0);
                     startFocusPosition(0);
                     mPosition = 0;
@@ -59,6 +63,9 @@ public class KeyEventHandler {
                 break;
             case KeyEvent.KEYCODE_DPAD_DOWN:
                 if (mPosition == -1) {
+                    if (mFocusViews.isEmpty()) {
+                        return false;
+                    }
                     mCurrentFocusView = mFocusViews.get(0);
                     startFocusPosition(0);
                     mPosition = 0;
@@ -84,7 +91,7 @@ public class KeyEventHandler {
                     recycleFocusView.performClick();
                     recycleFocusView.requestFocus();
                 } else {
-                    if (mCurrentFocusView.mFocusView == null) {
+                    if (mCurrentFocusView == null || mCurrentFocusView.mFocusView == null) {
                         return false;
                     }
                     if (mCurrentFocusView.mFocusView.hasOnClickListeners()) {
@@ -97,7 +104,7 @@ public class KeyEventHandler {
                 }
                 break;
             default:
-                if (mCurrentFocusView.mFocusView != null) {
+                if (mCurrentFocusView != null && mCurrentFocusView.mFocusView != null) {
                     mCurrentFocusView.mFocusView.setFocusable(false);
                 }
                 return false;
@@ -527,7 +534,7 @@ public class KeyEventHandler {
 
         @Override
         public void onClick(View v) {
-            if (!isHandleRecyclerView && v != mCurrentFocusView.mFocusView && mCurrentFocusView.mFocusView != null) {
+            if (!isHandleRecyclerView && mCurrentFocusView != null && v != mCurrentFocusView.mFocusView && mCurrentFocusView.mFocusView != null) {
                 mCurrentFocusView.mFocusView.setFocusable(false);
                 //mCurrentFocusView.mFocusView.setBackground(viewDrawableHashMap.get(mCurrentFocusView.mDownFocusView));
             }
@@ -546,8 +553,11 @@ public class KeyEventHandler {
                 ImageView imageView = (ImageView) v;
                 imageView.setImageDrawable(drawable);
             } else {
-                v.setBackground(null);
-                v.setBackground(drawable);
+                if (Build.VERSION.SDK_INT >= 16) {
+                    v.setBackground(drawable);
+                } else {
+                    v.setBackgroundDrawable(drawable);
+                }
             }
         }
     }
