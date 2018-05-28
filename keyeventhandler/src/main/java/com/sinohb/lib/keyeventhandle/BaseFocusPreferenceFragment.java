@@ -13,7 +13,9 @@ public abstract class BaseFocusPreferenceFragment extends PreferenceFragment {
     protected ViewGroup mViewGroup;
     public abstract ViewGroup getContentViewGroup();
 
-    public abstract List<View> getPreparedFocusViews();
+    public  List<View> getPreparedFocusViews(){
+        return null;
+    };
 
     @Override
     public void onAttach(Context context) {

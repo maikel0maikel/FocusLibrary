@@ -18,33 +18,18 @@ import android.widget.ImageView;
 public class ShadowDrawable extends Drawable {
     private Paint mPaint;
     private View view;
-    private Paint mPaintOut;
     Bitmap bd;
     private RectF mRectf;
-    //Bitmap lightBg;
-    Drawable mDrawable;
 
     private ShadowDrawable(View view) {
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
-        //mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_ATOP));
+        mPaint.setDither(true);
         mPaint.setColor(Color.RED);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(5.0f);
-//        mPaint.setStyle(Paint.Style.FILL);
-
-//        mPaintOut = new Paint();
-//        mPaintOut.setAntiAlias(true);
-//        mPaintOut.setDither(true);
-//        mPaintOut.setStyle(Paint.Style.FILL);
-
-//        mPaintOut.setColor(Color.YELLOW);
         this.view = view;
-        view.setDrawingCacheEnabled(true);
-        bd = view.getDrawingCache();
-        // bd = loadBitmapFromView(view);
-        //view.setDrawingCacheEnabled(false);
-        //lightBg = BitmapFactory.decodeResource(view.getContext().getResources(), R.mipmap.item_press_focus);
+        bd = getViewBitmap(view);
         mRectf = new RectF(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
     }
 
@@ -57,30 +42,74 @@ public class ShadowDrawable extends Drawable {
 
     @Override
     public void draw(@NonNull Canvas canvas) {
-
         // canvas.drawRect(new Rect(10, 10, view.getMeasuredWidth() - 10, view.getMeasuredHeight() - 10), mPaintOut);
-
         //canvas.drawRoundRect(mRectf,10,10, mPaint);
-//        if (lightBg == null) {
-
-//        } else {
-//            canvas.drawBitmap(lightBg, view.getLeft() - 10, view.getTop() - 10, mPaint);
-
-
         canvas.drawRoundRect(mRectf, 8, 8, mPaint);
-
-        mPaint.reset();
-        mPaint.setColor(Color.parseColor("#00CED1"));
-        mPaint.setStyle(Paint.Style.FILL);
         if (bd != null) {
-            canvas.save();
-            canvas.scale(0.8f, 0.8f, view.getMeasuredWidth() / 2, view.getMeasuredHeight() / 2);
+            //canvas.save();
+            mPaint.reset();
+            mPaint.setStrokeWidth(0.0f);
+            mPaint.setStyle(Paint.Style.STROKE);
+            mPaint.setAntiAlias(true);
+            mPaint.setDither(true);
+            canvas.scale(0.95f, 0.95f, view.getMeasuredWidth() / 2, view.getMeasuredHeight() / 2);
             //canvas.translate(view.getMeasuredWidth()*0.2f, view.getMeasuredHeight()*0.2f);
             canvas.drawBitmap(bd, 0, 0, mPaint);
-            //view.setDrawingCacheEnabled(false);
         }
-        //canvas.restore();
 
+    }
+
+//    public static Bitmap getViewBitmap(View view) {
+//        final boolean cachePreviousState = view.isDrawingCacheEnabled();
+//        final int backgroundPreviousColor = view.getDrawingCacheBackgroundColor();
+//        view.setDrawingCacheEnabled(true);
+//        view.buildDrawingCache();
+//        Bitmap cacheBitmap = view.getDrawingCache();
+//        if (cacheBitmap == null) {
+//            view.destroyDrawingCache(); // duplicate of below, flow could be reordered better
+//            view.setDrawingCacheEnabled(false);
+//            view.setDrawingCacheBackgroundColor(backgroundPreviousColor);
+//            return null;
+//        }
+//        final Bitmap bitmap = Bitmap.createBitmap(cacheBitmap);
+//        view.setDrawingCacheBackgroundColor(backgroundPreviousColor);
+//        view.destroyDrawingCache();
+//        view.setDrawingCacheEnabled(false);
+//        return bitmap;
+//    }
+
+    public static Bitmap getViewBitmap(View v) {
+        //v.clearFocus();
+        v.setPressed(false);
+
+        boolean willNotCache = v.willNotCacheDrawing();
+        v.setWillNotCacheDrawing(false);
+
+        // Reset the drawing cache background color to fully transparent
+        // for the duration of this operation
+        int color = v.getDrawingCacheBackgroundColor();
+        v.setDrawingCacheBackgroundColor(Color.TRANSPARENT);
+
+        if (color != 0) {
+            v.destroyDrawingCache();
+        }
+        v.buildDrawingCache();
+        Bitmap cacheBitmap = v.getDrawingCache();
+        if (cacheBitmap == null) {
+            v.destroyDrawingCache(); // duplicate of below, flow could be reordered better
+            v.setWillNotCacheDrawing(willNotCache);
+            v.setDrawingCacheBackgroundColor(color);
+            return null;
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap(cacheBitmap);
+
+        // Restore the view
+        v.destroyDrawingCache();
+        v.setWillNotCacheDrawing(willNotCache);
+        v.setDrawingCacheBackgroundColor(color);
+
+        return bitmap;
     }
 
     public static Bitmap drawableToBitmap(Drawable drawable) {
