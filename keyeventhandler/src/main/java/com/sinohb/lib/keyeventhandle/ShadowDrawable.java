@@ -62,6 +62,7 @@ public class ShadowDrawable extends Drawable {
 //    public static Bitmap getViewBitmap(View view) {
 //        final boolean cachePreviousState = view.isDrawingCacheEnabled();
 //        final int backgroundPreviousColor = view.getDrawingCacheBackgroundColor();
+//        view.setPressed(false);
 //        view.setDrawingCacheEnabled(true);
 //        view.buildDrawingCache();
 //        Bitmap cacheBitmap = view.getDrawingCache();

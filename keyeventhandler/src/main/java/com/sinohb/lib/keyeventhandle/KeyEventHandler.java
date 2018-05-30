@@ -35,12 +35,12 @@ public class KeyEventHandler {
     private View recycleFocusView = null;
     private boolean isSetFocusInTouch;
     private HashMap<Integer, Drawable> viewDrawableHashMap = new HashMap<>();
-    private boolean isVewGroupClick = false;
+    //private boolean isVewGroupClick = false;
 
     public boolean handleKeyEvent(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_DPAD_UP:
-                isVewGroupClick = false;
+                //isVewGroupClick = false;
                 if (mPosition == -1) {
                     if (mFocusViews.isEmpty()) {
                         return false;
@@ -61,7 +61,7 @@ public class KeyEventHandler {
                 setFocus(View.FOCUS_UP);
                 break;
             case KeyEvent.KEYCODE_DPAD_DOWN:
-                isVewGroupClick = false;
+                //isVewGroupClick = false;
                 if (mPosition == -1) {
                     if (mFocusViews.isEmpty()) {
                         return false;
@@ -83,32 +83,32 @@ public class KeyEventHandler {
                 break;
             case KeyEvent.KEYCODE_ENTER:
                 if (mPosition == -1) {
-                    isVewGroupClick = false;
+                    //isVewGroupClick = false;
                     return false;
                 }
                 if (mCurrentFocusView.mFocusView instanceof AbsListView) {
-                    isVewGroupClick = false;
+                    //isVewGroupClick = false;
                     return false;
                 } else if (isHandleRecyclerView && recycleFocusView != null) {
                     recycleFocusView.performClick();
                     recycleFocusView.requestFocus();
-                    isVewGroupClick = false;
+                    //isVewGroupClick = false;
                 } else {
                     if (mCurrentFocusView == null || mCurrentFocusView.mFocusView == null) {
-                        isVewGroupClick = false;
+                        //isVewGroupClick = false;
                         return false;
                     }
                     if (mCurrentFocusView.mFocusView.hasOnClickListeners()) {
                         mCurrentFocusView.mFocusView.performClick();
-                        isVewGroupClick = false;
+                        //isVewGroupClick = false;
                     } else {
                         if (mCurrentFocusView.mFocusView instanceof ViewGroup) {
-                            isVewGroupClick = true;
+                            //isVewGroupClick = true;
                             performClick((ViewGroup) mCurrentFocusView.mFocusView);
                         }
                     }
                     isHandleRecyclerView = false;
-                    isVewGroupClick = false;
+                    // isVewGroupClick = false;
                 }
                 break;
             default:
@@ -116,8 +116,26 @@ public class KeyEventHandler {
                     mCurrentFocusView.mFocusView.setFocusable(false);
                 }
                 isHandleRecyclerView = false;
-                isVewGroupClick = false;
+                //isVewGroupClick = false;
                 return false;
+        }
+        return true;
+    }
+	    public void dispatchTouchEvent(int x, int y) {
+        if (mCurrentFocusView != null && mCurrentFocusView.mFocusView != null) {
+            if (!inRangeOfView(mCurrentFocusView.mFocusView, x, y)) {
+                mCurrentFocusView.mFocusView.clearFocus();
+            }
+        }
+    }
+
+    private boolean inRangeOfView(View view, int evX, int evY) {
+        int[] location = new int[2];
+        view.getLocationOnScreen(location);
+        int x = location[0];
+        int y = location[1];
+        if (evX < x || evX > (x + view.getWidth()) || evY < y || evY > (y + view.getHeight())) {
+            return false;
         }
         return true;
     }
@@ -159,6 +177,9 @@ public class KeyEventHandler {
         mCurrentFocusView.mFocusView.requestFocusFromTouch();
         mCurrentFocusView.mFocusView.setFocusable(true);
         mCurrentFocusView.mFocusView.requestFocus();
+        if (mCurrentFocusView.isKeep){
+            mCurrentFocusView.isKeepShadow = true;
+        }
         if (mCurrentFocusView.mFocusView instanceof ViewGroup) {
             if (isListGroup(mCurrentFocusView.mFocusView)) {
                 handleListView(deration);
@@ -354,21 +375,35 @@ public class KeyEventHandler {
         }
     }
 
-    public void addPreparedFocusView(final View view) {
+    public void addPreparedFocusView(View view, boolean keep) {
         if (view == null) return;
         mFocusViews.add(view);
 //        if (!isPause){
 //            mListViews.add(view);
 //        }
-        handlePreparedView(view);
+        handlePreparedView(view, keep);
     }
 
-    private void handlePreparedView(View view) {
+    public void addPreparedFocusView(final View view) {
+
+        addPreparedFocusView(view, false);
+    }
+
+    private void handlePreparedView(View view, boolean keep) {
         view.setOnFocusChangeListener(new FocusListener());
         if (view instanceof ViewGroup) {
+            if (keep) {
+                FocusView<View> viewFocusView = mFocusViews.getFocusView(view);
+                if (viewFocusView != null) {
+                    viewFocusView.isKeepShadow = keep;
+                    viewFocusView.isKeep = keep;
+                    hookViewClickListener(view, null, keep);
+                    hookViewTouchListener(view);
+                }
+            }
             return;
         }
-        hookViewClickListener(view, null, true);
+        hookViewClickListener(view, null, keep);
         hookViewTouchListener(view);
     }
 
@@ -376,16 +411,21 @@ public class KeyEventHandler {
         if (isNoNeedSetBg(view)) {
             return;
         }
+        Drawable drawable = getViewDrawable(view);
+        map.put(view.getId(), drawable);
+    }
+
+    private Drawable getViewDrawable(View view) {
         Drawable drawable = null;
+        view.setPressed(false);
         if (view instanceof ImageView) {
             ImageView imageView = (ImageView) view;
             drawable = imageView.getDrawable();
         } else {
             drawable = view.getBackground();
         }
-        map.put(view.getId(), drawable);
+        return drawable;
     }
-
 
     class FocusListener implements View.OnFocusChangeListener {
         @Override
@@ -396,9 +436,9 @@ public class KeyEventHandler {
                 if (isNoNeedSetBg(v)) {
                     return;
                 }
-                if (!isVewGroupClick) {
+                //if (!isVewGroupClick) {
                     setNormalBackground(v);
-                }
+               // }
             } else {
                 if (isNoNeedSetBg(v)) {
                     return;
@@ -414,10 +454,14 @@ public class KeyEventHandler {
         return (view instanceof AbsListView) || (view instanceof RecyclerView) || isHandleRecyclerView;
     }
 
-    public void addPreparedFocusView(final View view, int postion) {
+    public void addPreparedFocusView(final View view, int postion, boolean keep) {
         if (view == null) return;
         mFocusViews.add(postion, view);
-        handlePreparedView(view);
+        handlePreparedView(view, keep);
+    }
+
+    public void addPreparedFocusView(final View view, int postion) {
+        addPreparedFocusView(view, postion, false);
     }
 
     public void addPreparedFocusGroup(ViewGroup group) {
@@ -512,7 +556,7 @@ public class KeyEventHandler {
             Field mOnTouchListener = listenerInfoClz.getDeclaredField("mOnTouchListener");
             mOnTouchListener.setAccessible(true);
             View.OnTouchListener originOnTouchListener = (View.OnTouchListener) mOnTouchListener.get(listenerInfo);
-            HookListener hookListener = new HookListener(originOnTouchListener);
+            HookTouchListener hookListener = new HookTouchListener(originOnTouchListener);
             mOnTouchListener.set(listenerInfo, hookListener);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -527,19 +571,27 @@ public class KeyEventHandler {
         }
     }
 
-    class HookListener implements View.OnTouchListener {
+    class HookTouchListener implements View.OnTouchListener {
         private View.OnTouchListener listener;
 
-        public HookListener(View.OnTouchListener listener) {
+        public HookTouchListener(View.OnTouchListener listener) {
             this.listener = listener;
         }
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            isVewGroupClick = false;
+            // isVewGroupClick = false;
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 if (!viewDrawableHashMap.containsKey(v.getId())) {
                     casheViewBackground(v, viewDrawableHashMap);
+                }
+                if (mCurrentFocusView != null && v != mCurrentFocusView.mFocusView) {
+                    setNormalBackground(mCurrentFocusView.mFocusView);
+                    mCurrentFocusView.mFocusView.clearFocus();
+                    mCurrentFocusView = mFocusViews.getFocusView(v);
+                    if (mCurrentFocusView != null) {
+                        mCurrentFocusView.isKeepShadow = false;
+                    }
                 }
             }
             if (listener == null)
@@ -548,7 +600,7 @@ public class KeyEventHandler {
         }
     }
 
-    private void hookViewClickListener(View view, ViewGroup parent, boolean restoreBackground) {
+    private void hookViewClickListener(View view, ViewGroup parent, boolean keep) {
         try {
             Method getLinstenerInfo = View.class.getDeclaredMethod("getListenerInfo");
             getLinstenerInfo.setAccessible(true);
@@ -557,7 +609,7 @@ public class KeyEventHandler {
             Field mOnclickListener = listenerInfoClz.getDeclaredField("mOnClickListener");
             mOnclickListener.setAccessible(true);
             View.OnClickListener originOnClickListener = (View.OnClickListener) mOnclickListener.get(listenerInfo);
-            HookOnClickListener hookListener = new HookOnClickListener(originOnClickListener, parent, restoreBackground);
+            HookOnClickListener hookListener = new HookOnClickListener(originOnClickListener, parent, keep);
             mOnclickListener.set(listenerInfo, hookListener);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -575,28 +627,33 @@ public class KeyEventHandler {
     class HookOnClickListener implements View.OnClickListener {
         private View.OnClickListener listener;
         private ViewGroup mParent;
-        private boolean isRestore;
+        private boolean keep;
 
-        public HookOnClickListener(View.OnClickListener listener, ViewGroup parent, boolean isRestore) {
+        public HookOnClickListener(View.OnClickListener listener, ViewGroup parent, boolean keep) {
             this.listener = listener;
             this.mParent = parent;
-            this.isRestore = isRestore;
+            this.keep = keep;
         }
 
         @Override
         public void onClick(View v) {
-            if (mParent != null && isVewGroupClick) {
-                setNormalBackground(mParent);
-                isVewGroupClick = false;
-            } else if (!isHandleRecyclerView && mCurrentFocusView != null && v != mCurrentFocusView.mFocusView && mCurrentFocusView.mFocusView != null && !isVewGroupClick) {
-                mCurrentFocusView.mFocusView.setFocusable(false);
-                setNormalBackground(mCurrentFocusView.mFocusView);
+//            if (mParent != null && isVewGroupClick) {
+//                setNormalBackground(mParent);
+//                isVewGroupClick = false;
+//                ShadowDrawable.setShadowDrawable(v);
+//            } else
+            if (!isHandleRecyclerView && mCurrentFocusView != null && v != mCurrentFocusView.mFocusView && mCurrentFocusView.mFocusView != null) {
+                mCurrentFocusView.mFocusView.clearFocus();
+                //setNormalBackground(mCurrentFocusView.mFocusView);
+            }
+            if (keep && mCurrentFocusView != null && v == mCurrentFocusView.mFocusView) {
+                FocusView<View> focusView = mFocusViews.getFocusView(v);
+                if (focusView != null && focusView.isKeepShadow) {
+                    setNormalBackground(v);
+                    ShadowDrawable.setShadowDrawable(v);
+                }
             }
             isHandleRecyclerView = false;
-            //if (!isNoNeedSetBg(v) && isRestore) {
-            // setNormalBackground(v);
-            //ShadowDrawable.setShadowDrawable(v);
-            //}
             if (listener == null) {
                 return;
             }

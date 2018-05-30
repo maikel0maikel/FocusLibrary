@@ -6,6 +6,8 @@ public class FocusView<T> {
     public FocusView mDownFocusView;
     public T mFocusView;
     public int position;
+    public boolean isKeepShadow;
+    public boolean isKeep;
     public FocusView(T currentFocusView, FocusView upFocus, FocusView downFocus, int position) {
         this.mFocusView = currentFocusView;
         this.mUpFocusView = upFocus;

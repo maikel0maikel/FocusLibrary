@@ -113,6 +113,33 @@ public class LinkedFocusViewStack<T> {
         return -1;
     }
 
+    public FocusView getFocusView(T obj){
+        FocusView<T> node;
+        if(obj==null)
+        {
+            for(node = header.mDownFocusView; node!=header; node=node.mDownFocusView)
+            {
+                if(node.mFocusView == null)
+                {
+                    return node;
+                }
+            }
+        }
+        else
+        {
+            for(node = header.mDownFocusView; node!=header; node=node.mDownFocusView)
+            {
+                if(node.mFocusView == obj || obj.equals(node.mFocusView))
+                {
+                    return node;
+                }
+            }
+        }
+
+        return null;
+    }
+
+
     public FocusView<T> get(int index) {
         return entry(index);
     }

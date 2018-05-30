@@ -1,6 +1,7 @@
 package com.sinohb.lib.keyeventhandle;
 
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -52,6 +53,9 @@ public abstract class BaseFoucsHandlerActivity extends AutoLayoutActivity {
     public void addPreparedFocusView(View view) {
         mHandler.addPreparedFocusView(view);
     }
+    public void addPreparedFocusView(View view, boolean keep) {
+        mHandler.addPreparedFocusView(view, keep);
+    }
     public void addPreparedFocusView(View view,int position) {
         mHandler.addPreparedFocusView(view,position);
     }
@@ -71,7 +75,19 @@ public abstract class BaseFoucsHandlerActivity extends AutoLayoutActivity {
 //        return super.dispatchKeyEvent(event);
 //    }
 
-
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {//屏幕触摸事件
+        switch (event.getAction()) {
+            case KeyEvent.ACTION_DOWN:
+                int x = (int) event.getRawX();
+                int y = (int) event.getRawY();
+                mHandler.dispatchTouchEvent(x, y);
+                break;
+            default:
+                break;
+        }
+        return super.dispatchTouchEvent(event);
+    }
 
     @Override
     protected void onResume() {
