@@ -25,7 +25,7 @@ public class ShadowDrawable extends Drawable {
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setDither(true);
-        mPaint.setColor(Color.RED);
+        mPaint.setColor(Color.parseColor("#956602"));//956602
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(5.0f);
         this.view = view;
